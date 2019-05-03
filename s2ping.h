@@ -16,7 +16,8 @@ struct s2ping_frame {
 	struct ether_header eth;
 	uint8_t		ver;
 	uint8_t		type;
-	uint16_t	rsv;
+	uint8_t		seq;
+	uint8_t		rsv;
 	uint8_t		src[ETH_ALEN];	/* original addr of src */
 	uint64_t	ts;
 } __attribute__((packed));

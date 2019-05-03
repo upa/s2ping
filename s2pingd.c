@@ -102,8 +102,9 @@ int s2ping_handle_packet(int sock, struct s2ping_frame *frame, size_t len,
 	char replybuf[BUFLEN];
 	struct s2ping_frame *reply = (struct s2ping_frame *)replybuf;
 
+
 	/* validation */
-	if (frame->ver != ETH_P_S2PING)
+	if (frame->ver != S2PING_VERSION)
 		return -1;
 
 	if (frame->type != S2PING_TYPE_ECHO)
@@ -168,7 +169,7 @@ void usage(void) {
 int main(int argc, char **argv) {
 	
 	int n, ret;
-	int nths;
+	int nths = 0;
 	struct s2pingd_thread ths[MAX_INTF_NUM];
 
 	memset(ths, 0, sizeof(ths));
@@ -209,6 +210,11 @@ int main(int argc, char **argv) {
 		}
 				     
 		nths++;
+	}
+
+	if (nths == 0) {
+		fprintf(stderr, "no interface specified\n");
+		return 1;
 	}
 
 	if (signal(SIGINT, sig_handler) == SIG_ERR) {

@@ -4,7 +4,7 @@ INCLUDE := -I./
 LDFLAGS := -pthread
 CFLAGS := -g -Wall $(INCLUDE)
 
-PROGNAME = s2pingd
+PROGNAME = s2pingd s2ping
 
 all: $(PROGNAME)
 
