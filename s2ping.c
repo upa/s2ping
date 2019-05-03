@@ -269,7 +269,7 @@ int main(int argc, char **argv) {
 
 			/* ok, this is the the packet we want */
 			printf("%d bytes from %02x:%02x:%02x:%02x:%02x:%02x "
-			       "s2ping_seq=%u time=%.2f ms\n",
+			       "seq=%u time=%.2f ms\n",
 			       ret,
 			       reply->eth.ether_shost[0],
 			       reply->eth.ether_shost[1],

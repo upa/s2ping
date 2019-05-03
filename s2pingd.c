@@ -31,7 +31,7 @@ void sig_handler(int sig) {
 	if (sig == SIGINT)
 		caught_signal = 1;
 
-	printf("SIGINT received\n");
+	printf("\nSIGINT received\n");
 }
 
 
