@@ -1,5 +1,6 @@
-trial
 *.o
+.*.swp
+
 
 s2pingd
 s2ping

@@ -199,7 +199,6 @@ int main(int argc, char **argv) {
 	frame->ver = S2PING_VERSION;
 	frame->type = S2PING_TYPE_ECHO;
 	frame->seq = 0;
-	frame->rsv = 0;
 
 	x.fd = sock;
 	x.events = POLLIN;

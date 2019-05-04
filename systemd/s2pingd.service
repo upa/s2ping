@@ -1,0 +1,14 @@
+[Unit]
+Description=s2pingd: simple layer-2 ping daemon
+After=network.target
+
+[Service]
+EnvironmentFile=-/etc/default/s2pingd
+ExecStart=/usr/local/sbin/s2pingd $S2PINGD_OPTS
+KillMode=process
+Restart=always
+Type=simple
+
+[Install]
+WantedBy=multi-user.target
+Alias=s2pingd.service
