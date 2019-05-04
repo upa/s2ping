@@ -1,10 +1,10 @@
 
 ## super simple layer-2 ping
 
-This is very simple layer-2 ping application and daemon on
+This is a very simple userland application for layer-2 ping on
 Linux. `s2pingd` runs as a daemon through systemd, and listens on
 ethrenet interfaces using AF_PACKET socket. You can send echo request
-frames receive reply frames from `s2pingd` using `s2ping` command.
+frames using `s2ping` command, and receive reply frames from `s2pingd`
 
 ```
 $ s2ping -h
