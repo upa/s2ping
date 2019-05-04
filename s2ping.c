@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 	memset(recv_buf, 0, sizeof(recv_buf));
 	
 	/* scan options */
-	while ((ch = getopt(argc, argv, "i:c:I:T:")) != -1) {
+	while ((ch = getopt(argc, argv, "i:c:s:I:T:")) != -1) {
 		switch (ch) {
 		case 'i':
 			ifname = optarg;
@@ -134,37 +134,37 @@ int main(int argc, char **argv) {
 			count = atoi(optarg);
 			if (count < 1) {
 				fprintf(stderr, "invalid -c %s\n", optarg);
-				return 1;
+				return -1;
 			}
 			break;
 		case 's':
 			size = atoi(optarg);
 			if (size < sizeof(struct s2ping_frame)) {
 				fprintf(stderr, "too small -s %s\n", optarg);
-				return 1;
+				return -1;
 			}
 			if (size > BUFLEN) {
 				fprintf(stderr, "too large -s %s\n", optarg);
-				return 1;
+				return -1;
 			}
 			break;
 		case 'I':
 			interval = atof(optarg) * 1000;
 			if (interval < 0) {
 				fprintf(stderr, "invalid -I %s\n", optarg);
-				return 1;
+				return -1;
 			}
 			break;
 		case 'T':
 			timeout = atof(optarg) * 1000;
 			if (timeout < 0) {
 				fprintf(stderr, "invalid -T %s\n", optarg);
-				return 1;
+				return -1;
 			}
 			break;
 		default:
 			usage();
-			return 1;
+			return -1;
 		}
 	}
 
@@ -175,20 +175,20 @@ int main(int argc, char **argv) {
 	if (ret < 6) {
 		fprintf(stderr, "invalid dst mac address '%s'\n",
 			argv[argc - 1]);
-		return 1;
+		return -1;
 	}
 
 	if (!ifname) {
 		fprintf(stderr, "-i interface must be specified\n");
-		return 1;
+		return -1;
 	}
 
 	if (get_mac(ifname, srcmac) < 0)
-		return 1;
+		return -1;
 
 	sock = create_packet_sock(ifname);
 	if (sock < 0)
-		return 1;
+		return -1;
 
 	/* build s2ping frame */
 	frame = (struct s2ping_frame *)send_buf;
@@ -232,24 +232,27 @@ int main(int argc, char **argv) {
 		ret = write(sock, frame, size);
 		if (ret < 0) {
 			perror("write");
-			return 1;
+			return -1;
 		}
 
 		/* recv reply frame */
 		int elapsed = 0;
+		int completed = 0;
 		while (1) {
 
 			if (caught_signal)
 				break;
 
 			if (elapsed >= timeout) {
-				printf("timeout for seq %u\n", frame->seq);
+				if (!completed)
+					printf("timeout for seq %u\n",
+					       frame->seq);
 				break;
 			}
 
 			if (ppoll(&x, 1, &to, &sigset) < 0) {
 				perror("poll");
-				return 1;
+				return -1;
 			}
 			elapsed += 100;
 
@@ -261,10 +264,6 @@ int main(int argc, char **argv) {
 
 			/* validate */
 			if (reply->seq != frame->seq)
-				continue;
-
-			if (memcmp(reply->eth.ether_shost, dstmac, ETH_ALEN)
-			    != 0)
 				continue;
 
 			/* ok, this is the the packet we want */
@@ -279,8 +278,10 @@ int main(int argc, char **argv) {
 			       reply->eth.ether_shost[5],
 			       reply->seq,
 			       ((double)reply->ts - (double)frame->ts) * 1000);
-			received++;
-			break;
+			if (!completed) {
+				received++;
+				completed = 1;
+			}
 		}
 
 		sent++;
