@@ -97,6 +97,7 @@ void usage(void) {
 	       "    -s size, size of probe packet\n"
 	       "    -I interval, second\n"
 	       "    -T timeout, second\n"
+	       "    -h print this help\n"
 		);
 }
 
@@ -125,7 +126,7 @@ int main(int argc, char **argv) {
 	memset(recv_buf, 0, sizeof(recv_buf));
 	
 	/* scan options */
-	while ((ch = getopt(argc, argv, "i:c:s:I:T:")) != -1) {
+	while ((ch = getopt(argc, argv, "i:c:s:I:T:h")) != -1) {
 		switch (ch) {
 		case 'i':
 			ifname = optarg;
@@ -162,6 +163,7 @@ int main(int argc, char **argv) {
 				return -1;
 			}
 			break;
+		case 'h':
 		default:
 			usage();
 			return -1;
